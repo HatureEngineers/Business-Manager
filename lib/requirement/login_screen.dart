@@ -1,6 +1,7 @@
+import 'package:bebshar_poristhiti/requirement/pin_setup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../home_screen.dart'; // Import your home screen
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
   final Function toggleTheme; // Add the toggleTheme parameter
@@ -30,7 +31,8 @@ class _LoginScreenState extends State<LoginScreen> {
         verificationCompleted: (PhoneAuthCredential credential) async {
           // Auto-verification
           await _auth.signInWithCredential(credential);
-          _navigateToHomeScreen();
+          _saveUserDataToFirestore();  // Save user data after login
+          _navigateToPinSetupScreen();
         },
         verificationFailed: (FirebaseAuthException e) {
           _showSnackBar('Verification failed: ${e.message}');
@@ -60,12 +62,24 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       try {
         await _auth.signInWithCredential(credential);
-        _navigateToHomeScreen();
+        _saveUserDataToFirestore();  // Save user data after login
+        _navigateToPinSetupScreen();
       } catch (e) {
-        _showSnackBar('Invalid OTP');
+        _showSnackBar('Invalid OTP. Please try again.');
       }
     } else {
       _showSnackBar('Please enter the OTP');
+    }
+  }
+
+  // Save user data to Firestore
+  Future<void> _saveUserDataToFirestore() async {
+    User? currentUser = _auth.currentUser;
+    if (currentUser != null) {
+      await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).set({
+        'phone': currentUser.phoneNumber,  // Store user's phone number
+        // Add any additional user data you need
+      }, SetOptions(merge: true));
     }
   }
 
@@ -76,11 +90,11 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Navigate to home screen after successful login
-  void _navigateToHomeScreen() {
+  // Navigate to PIN setup screen after successful login
+  void _navigateToPinSetupScreen() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => HomeScreen(
+        builder: (_) => PinSetupScreen(
           toggleTheme: widget.toggleTheme, // Pass the toggleTheme to HomeScreen
           isDarkTheme: widget.isDarkTheme, // Pass the isDarkTheme state to HomeScreen
         ),

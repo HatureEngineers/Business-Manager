@@ -1,9 +1,10 @@
-// main.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'requirement/login_screen.dart';
 import 'home_screen.dart';
+import 'requirement/pin_setup_screen.dart'; // Pin setup screen import
+import 'requirement/pin_verification_screen.dart'; // Pin verification screen import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,13 +60,12 @@ class AuthWrapper extends StatelessWidget {
         } else if (snapshot.hasError) {
           return Center(child: Text("Something went wrong")); // Error message
         } else if (snapshot.hasData) {
-          // User is logged in
-          return HomeScreen(
+          // After login, navigate to PIN verification screen
+          return PinVerificationScreen(
             toggleTheme: toggleTheme,
             isDarkTheme: isDarkTheme,
           );
         } else {
-          // User is not logged in
           return LoginScreen(
             toggleTheme: toggleTheme, // Pass toggleTheme to LoginScreen
             isDarkTheme: isDarkTheme, // Pass isDarkTheme to LoginScreen

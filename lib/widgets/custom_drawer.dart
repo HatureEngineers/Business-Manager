@@ -1,10 +1,10 @@
 import 'dart:io';
+import 'package:bebshar_poristhiti/requirement/pin_verification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../bill/app_payment.dart';
 import '../product_management/product.dart';
-import '../requirement/login_screen.dart';
 import '../sales_management/due/add_customer_page.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -14,7 +14,7 @@ class CustomDrawer extends StatefulWidget {
   final Function onImagePick;
   final Function toggleTheme; // <-- নতুন পরিবর্তন: থিম টগল করার জন্য ফাংশন
   final bool
-      isDarkTheme; // <-- নতুন প্যারামিটার যোগ করা ডার্ক থিমের স্টেটের জন্য
+  isDarkTheme; // <-- নতুন প্যারামিটার যোগ করা ডার্ক থিমের স্টেটের জন্য
 
   CustomDrawer({
     required this.name,
@@ -121,11 +121,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     await _auth.signOut();
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
-                        builder: (context) => LoginScreen(
-                          toggleTheme: widget
-                              .toggleTheme, // toggleTheme প্যারামিটার পাস করা
-                          isDarkTheme: widget
-                              .isDarkTheme, // isDarkTheme প্যারামিটার পাস করা
+                        builder: (context) => PinVerificationScreen(
+                          toggleTheme: widget.toggleTheme, // toggleTheme প্যারামিটার পাস করা
+                          isDarkTheme: widget.isDarkTheme, // isDarkTheme প্যারামিটার পাস করা
                         ),
                       ),
                     );
