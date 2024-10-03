@@ -24,11 +24,6 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
     _getCurrentUser();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
   // Get the current user
   void _getCurrentUser() {
     _currentUser = _auth.currentUser;
@@ -65,7 +60,7 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
           ),
         );
       } else {
-        _showSnackBar('Incorrect PIN');
+        _showSnackBar('ভুল পিন দিয়েছেন');
       }
     } else {
       _showSnackBar('No PIN found. Please set up a PIN first.');
@@ -82,22 +77,55 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Enter PIN')),
+      appBar: AppBar(
+        title: Text('আপনার পিন দিয়ে লগইন করুন'),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextField(
-              controller: _pinController,
-              decoration: InputDecoration(labelText: 'Enter your PIN'),
-              keyboardType: TextInputType.number,
-              maxLength: 4,
-              obscureText: true,
+            Text(
+              'এখানে ৪ সংখার সঠিক পিন দিতে হবে',
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+              textAlign: TextAlign.center,
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.blueAccent, width: 2),
+              ),
+              child: TextField(
+                controller: _pinController,
+                decoration: InputDecoration(
+                  labelText: 'Enter your PIN',
+                  labelStyle: TextStyle(color: Colors.blueAccent),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                  ),
+                ),
+                keyboardType: TextInputType.number,
+                maxLength: 4,
+                obscureText: true,
+              ),
+            ),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: _verifyPin,
-              child: Text('Verify PIN'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent, // Background color
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                textStyle: TextStyle(fontSize: 18),
+              ),
+              child: Text(
+                'পিন যাচাই করুন',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),

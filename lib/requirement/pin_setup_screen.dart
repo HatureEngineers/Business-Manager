@@ -21,22 +21,28 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
   void _savePin() async {
     String pin = _pinController.text.trim();
     if (pin.length == 4) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(_auth.currentUser?.uid)
-          .set({'pin': pin}, SetOptions(merge: true));
+      try {
+        // Save PIN to Firestore for the logged-in user
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(_auth.currentUser?.uid)
+            .set({'pin': pin}, SetOptions(merge: true));
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => HomeScreen(
-            toggleTheme: widget.toggleTheme,
-            isDarkTheme: widget.isDarkTheme,
+        // Navigate to HomeScreen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => HomeScreen(
+              toggleTheme: widget.toggleTheme,
+              isDarkTheme: widget.isDarkTheme,
+            ),
           ),
-        ),
-      );
+        );
+      } catch (e) {
+        _showSnackBar('Error saving PIN: $e');
+      }
     } else {
-      _showSnackBar('Please enter a valid 4-digit PIN');
+      _showSnackBar('দয়া করে ৪ সংখার সঠিক পিন দিন');
     }
   }
 
@@ -50,22 +56,55 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Set Up PIN')),
+      appBar: AppBar(
+        title: Text('এখান থেকে নতুন পিন যুক্ত করুন'),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
           children: [
-            TextField(
-              controller: _pinController,
-              decoration: InputDecoration(labelText: 'Enter 4-digit PIN'),
-              keyboardType: TextInputType.number,
-              maxLength: 4,
-              obscureText: true, // Hide the pin input
+            Text(
+              'দয়া করে আপনার ৪ সংখ্যার পিন দিন:',
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+              textAlign: TextAlign.center,
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.blueAccent, width: 2),
+              ),
+              child: TextField(
+                controller: _pinController,
+                decoration: InputDecoration(
+                  labelText: '৪ সংখ্যার পিন দিন',
+                  labelStyle: TextStyle(color: Colors.blueAccent),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                  ),
+                ),
+                keyboardType: TextInputType.number,
+                maxLength: 4,
+                obscureText: true, // Hide the pin input for security
+              ),
+            ),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: _savePin,
-              child: Text('Save PIN'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent, // Background color
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                textStyle: TextStyle(fontSize: 18),
+              ),
+              child: Text(
+                'Save PIN',
+                style: TextStyle(color: Colors.white), // Change text color
+              ),
             ),
           ],
         ),

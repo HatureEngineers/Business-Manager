@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../bill/app_payment.dart';
 import '../product_management/product.dart';
+import '../requirement/pin_arter_logout.dart';
 import '../sales_management/due/add_customer_page.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -118,10 +119,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   icon: Icons.logout,
                   text: 'লগ আউট',
                   onTap: () async {
-                    await _auth.signOut();
+                    // Firebase থেকে সাইন আউট না করেই শুধু অ্যাপ থেকে লগআউট
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
-                        builder: (context) => PinVerificationScreen(
+                        builder: (context) => PinAfterLogout(
                           toggleTheme: widget.toggleTheme, // toggleTheme প্যারামিটার পাস করা
                           isDarkTheme: widget.isDarkTheme, // isDarkTheme প্যারামিটার পাস করা
                         ),

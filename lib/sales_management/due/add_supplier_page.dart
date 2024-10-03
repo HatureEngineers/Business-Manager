@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart'; // For formatting date
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddSupplierPage extends StatefulWidget {
   @override
@@ -18,6 +19,12 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
   DateTime? _selectedDate;
   File? _selectedImage;
   String? _image;
+
+  // Get the current user's UID
+  String? getCurrentUserId() {
+    User? user = FirebaseAuth.instance.currentUser;
+    return user?.uid;
+  }
 
   // Date picker function
   Future<void> _selectDate(BuildContext context) async {
@@ -44,7 +51,7 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
     }
   }
 
-  // Save supplier function (you would handle Firebase saving here)
+  // Save supplier function
   void _saveSupplier() async {
     if (_formKey.currentState!.validate()) {
       // Image upload to Firebase Storage
@@ -58,30 +65,41 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
         _image = 'assets/error.jpg'; // Default image path if no image is picked
       }
 
-      // supplier data to Firebase (this is where you would save to Firestore)
-      final supplierData = {
-        'name': _nameController.text,
-        'phone': _phoneController.text,
-        'image': _image,
-        'transaction': double.parse(_transactionController.text),
-        'transactionDate': _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
-      };
-      // Save data to Firestore
-      await FirebaseFirestore.instance.collection('suppliers').add(supplierData);
+      // Get current user ID
+      String? uid = getCurrentUserId();
+      if (uid != null) {
+        // supplier data to Firebase (this is where you would save to Firestore)
+        final supplierData = {
+          'name': _nameController.text,
+          'phone': _phoneController.text,
+          'image': _image,
+          'transaction': double.parse(_transactionController.text),
+          'transactionDate': _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
+          'userId': uid, // Save the user ID for this supplier
+        };
 
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('সাপ্লায়ার সফলভাবে যুক্ত হয়েছে')),
-      );
+        // Save data to Firestore under the current user's collection
+        await FirebaseFirestore.instance.collection('users').doc(uid).collection('suppliers').add(supplierData);
 
-      print("Supplier Data Saved: $supplierData");
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('সাপ্লায়ার সফলভাবে যুক্ত হয়েছে')),
+        );
 
-      // Clear form after saving
-      _formKey.currentState!.reset();
-      setState(() {
-        _selectedDate = null;
-        _selectedImage = null;
-      });
+        print("Supplier Data Saved: $supplierData");
+
+        // Clear form after saving
+        _formKey.currentState!.reset();
+        setState(() {
+          _selectedDate = null;
+          _selectedImage = null;
+        });
+      } else {
+        // Handle the case when the user is not logged in
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('ব্যবহারকারী লগ ইন করা নেই')),
+        );
+      }
     }
   }
 
@@ -152,7 +170,6 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
                     ),
                   ),
                 ),
-
 
                 SizedBox(height: 20),
 
