@@ -22,16 +22,16 @@
 //         onSelected: (dynamic suggestion) {
 //           onSupplierSelected(suggestion['id']); // Select supplier by ID
 //         },
-//         textFieldConfiguration: (context, controller, focusNode) {
-//           return TextField(
-//             controller: controller,
-//             focusNode: focusNode,
-//             decoration: InputDecoration(
-//               labelText: 'সাপ্লায়ার খুঁজুন',
-//               border: OutlineInputBorder(),
-//             ),
-//           );
-//         },
+//         // textFieldConfiguration: (context, controller, focusNode) {
+//         //   return TextField(
+//         //     controller: controller,
+//         //     focusNode: focusNode,
+//         //     decoration: InputDecoration(
+//         //       labelText: 'সাপ্লায়ার খুঁজুন',
+//         //       border: OutlineInputBorder(),
+//         //     ),
+//         //   );
+//         // },
 //         suggestionsCallback: (pattern) async {
 //           QuerySnapshot snapshot = await FirebaseFirestore.instance
 //               .collection('suppliers')

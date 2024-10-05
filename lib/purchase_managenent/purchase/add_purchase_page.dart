@@ -37,7 +37,7 @@
 //
 //   // Get suppliers stream method (moved to this class)
 //   Stream<QuerySnapshot> _getSuppliers() {
-//     String? uid = getCurrentUserId(); // This method is imported from firebase_services.dart
+//     String? uid = getCurrentUserId();
 //     if (uid != null) {
 //       return FirebaseFirestore.instance.collection('users').doc(uid).collection('suppliers').snapshots();
 //     }
@@ -106,10 +106,10 @@
 //             child: Column(
 //               crossAxisAlignment: CrossAxisAlignment.start,
 //               children: [
-//                 _buildPartyTypeSelection(),  // Party type selection method
+//                 _buildPartyTypeSelection(),
 //                 SizedBox(height: 20),
-//                 _partyType == 'নতুন পার্টি'
-//                     ? buildNewPartySection( // For new supplier entry
+//                 _partyType == 'নতুন পার ্টি'
+//                     ? buildNewPartySection(
 //                   nameController: _nameController,
 //                   phoneController: _phoneController,
 //                   transactionController: _transactionController,
@@ -125,7 +125,7 @@
 //                     );
 //                   },
 //                 )
-//                     : buildOldPartySection( // For existing supplier entry
+//                     : buildOldPartySection(
 //                   searchController: _searchController,
 //                   suppliersStream: _getSuppliers(),
 //                   onSupplierSelected: _onSupplierSelected,
@@ -143,39 +143,36 @@
 //     );
 //   }
 //
-//   // Party type selection method
+//   // Build party type selection widget
 //   Widget _buildPartyTypeSelection() {
 //     return Row(
-//       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 //       children: [
-//         ElevatedButton(
-//           onPressed: () {
-//             setState(() {
-//               _partyType = 'পুরাতন পার্টি';
-//             });
-//           },
-//           style: ElevatedButton.styleFrom(
-//             padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-//             backgroundColor: _partyType == 'পুরাতন পার্টি' ? Colors.green : Colors.grey,
-//           ),
-//           child: Text(
-//             'পুরাতন পার্টি',
-//             style: TextStyle(fontSize: 18, color: Colors.white),
+//         Expanded(
+//           child: ListTile(
+//             title: Text('নতুন পার্টি'),
+//             leading: Radio(
+//               value: 'নতুন পার্টি',
+//               groupValue: _partyType,
+//               onChanged: (value) {
+//                 setState(() {
+//                   _partyType = value as String;
+//                 });
+//               },
+//             ),
 //           ),
 //         ),
-//         ElevatedButton(
-//           onPressed: () {
-//             setState(() {
-//               _partyType = 'নতুন পার্টি';
-//             });
-//           },
-//           style: ElevatedButton.styleFrom(
-//             padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-//             backgroundColor: _partyType == 'নতুন পার্টি' ? Colors.green : Colors.grey,
-//           ),
-//           child: Text(
-//             'নতুন পার্টি',
-//             style: TextStyle(fontSize: 18, color: Colors.white),
+//         Expanded(
+//           child: ListTile(
+//             title: Text('পুরাতন পার্টি'),
+//             leading: Radio(
+//               value: 'পুরাতন পার্টি',
+//               groupValue: _partyType,
+//               onChanged: (value) {
+//                 setState(() {
+//                   _partyType = value as String;
+//                 });
+//               },
+//             ),
 //           ),
 //         ),
 //       ],

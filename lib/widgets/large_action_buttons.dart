@@ -1,7 +1,7 @@
-import 'package:bebshar_poristhiti/purchase_managenent/purchase/add_purchase_page.dart';
 import 'package:flutter/material.dart';
-
+import '../purchase_managenent/purchase/add_purchase_page.dart';
 import '../purchase_managenent/temp.dart';
+import '../sales_management/sale_page.dart';
 
 class LargeActionButtons extends StatelessWidget {
   final BuildContext context;
@@ -30,7 +30,7 @@ class LargeActionButtons extends StatelessWidget {
           if (label == 'ক্রয়') {
             Navigator.push(context, MaterialPageRoute(builder: (context) => AddPurchasePage()));
           } else if (label == 'বিক্রয়') {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => AddPurchasePage()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => SalesPage()));
           }
         },
         child: Card(

@@ -25,6 +25,10 @@ class _AddPurchasePageState extends State<AddPurchasePage> {
   String? _selectedSupplier;
   double _previousAmount = 0.0; // Placeholder for previous amount
 
+  // State variables for selected supplier details
+  String? _selectedSupplierName;
+  String? _selectedSupplierPhone;
+
   // Get current user's UID
   String? getCurrentUserId() {
     User? user = FirebaseAuth.instance.currentUser;
@@ -120,32 +124,18 @@ class _AddPurchasePageState extends State<AddPurchasePage> {
 
   Widget _buildOldPartySection() {
     final TextEditingController _searchController = TextEditingController();
-    String? _selectedSupplierName;
-    String? _selectedSupplierPhone;
-    double _previousAmount = 0.0; // Initialize _previousAmount to avoid potential errors
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TypeAheadField(
-          onSelected: (dynamic suggestion) {
-            setState(() {
-              _selectedSupplier = suggestion['id'];
-              _selectedSupplierName = suggestion['name'];
-              _selectedSupplierPhone = suggestion['phone'];
-              _previousAmount = suggestion['transaction'] ?? 0.0; // Handle potential missing 'transaction' field
-            });
-          },
-          // textFieldBuilder: (context, TextEditingController controller, FocusNode focusNode) {
-          //   return TextField(
-          //     controller: controller,
-          //     focusNode: focusNode,
-          //     decoration: InputDecoration(
-          //       labelText: 'সাপ্লায়ার খুঁজুন',
-          //       border: OutlineInputBorder(),
-          //     ),
-          //   );
-          // },
+          textFieldConfiguration: TextFieldConfiguration(
+            controller: _searchController,
+            decoration: InputDecoration(
+              labelText: 'সাপ্লায়ার নাম অনুসন্ধান করুন',
+              border: OutlineInputBorder(),
+            ),
+          ),
           suggestionsCallback: (pattern) async {
             String? uid = getCurrentUserId();
             if (uid != null) {
@@ -156,7 +146,12 @@ class _AddPurchasePageState extends State<AddPurchasePage> {
                   .where('name', isGreaterThanOrEqualTo: pattern)
                   .where('name', isLessThanOrEqualTo: pattern + '\uf8ff')
                   .get();
-              return snapshot.docs.map((e) => e.data()).toList();
+              return snapshot.docs.map((e) => {
+                'id': e.id,
+                'name': e['name'],
+                'phone': e['phone'],
+                'transaction': e['transaction'] ?? 0.0,
+              }).toList();
             }
             return [];
           },
@@ -166,18 +161,26 @@ class _AddPurchasePageState extends State<AddPurchasePage> {
               subtitle: Text(supplier['phone']),
             );
           },
-          emptyBuilder: (context) => Padding(
+          onSuggestionSelected: (dynamic suggestion) {
+            setState(() {
+              _selectedSupplier = suggestion['id'];
+              _selectedSupplierName = suggestion['name'];
+              _selectedSupplierPhone = suggestion['phone'];
+              _previousAmount = suggestion['transaction'] ?? 0.0;
+            });
+          },
+          noItemsFoundBuilder: (context) => Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text('কোনও সাপ্লায়ার খুঁজে পাওয়া যায়নি'),
           ),
         ),
         SizedBox(height: 20),
         Text(
-          'নাম: $_selectedSupplierName',
+          'নাম: ${_selectedSupplierName ?? ''}',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         Text(
-          'ফোন নম্বর: $_selectedSupplierPhone',
+          'ফোন নম্বর: ${_selectedSupplierPhone ?? ''}',
           style: TextStyle(fontSize: 16),
         ),
         SizedBox(height: 10),
@@ -248,7 +251,7 @@ class _AddPurchasePageState extends State<AddPurchasePage> {
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'এখানে নাম লিখুন';
+              return 'নাম লিখুন';
             }
             return null;
           },
@@ -263,7 +266,7 @@ class _AddPurchasePageState extends State<AddPurchasePage> {
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'এখানে ফোন নম্বর লিখুন';
+              return 'ফোন নম্বর লিখুন';
             }
             return null;
           },
@@ -273,71 +276,36 @@ class _AddPurchasePageState extends State<AddPurchasePage> {
           controller: _transactionController,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
-            labelText: 'লেনদেনের পরিমাণ(টাকা)',
+            labelText: 'লেনদেনের পরিমাণ',
             border: OutlineInputBorder(),
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'এখানে লেনদেনের পরিমাণ লিখুন';
-            }
-            if (double.tryParse(value) == null) {
-              return 'সঠিক পরিমাণ লিখুন';
+              return 'লেনদেনের পরিমাণ লিখুন';
             }
             return null;
           },
         ),
-        SizedBox(height: 30),
-        Center(
-          child: ElevatedButton(
-            onPressed: _saveNewSupplier,
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-              backgroundColor: Colors.green,
-            ),
-            child: Text(
-              'সেভ করুন',
-              style: TextStyle(fontSize: 18, color: Colors.white),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // UI for party type selection
-  Widget _buildPartyTypeSelection() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        ElevatedButton(
-          onPressed: () {
-            setState(() {
-              _partyType = 'পুরাতন পার্টি';
-            });
-          },
-          style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-            backgroundColor: _partyType == 'পুরাতন পার্টি' ? Colors.green : Colors.grey,
-          ),
-          child: Text(
-            'পুরাতন পার্টি',
-            style: TextStyle(fontSize: 18, color: Colors.white),
-          ),
+        SizedBox(height: 20),
+        Text(
+          'লেনদেনের তারিখ: ${DateFormat('dd/MM/yyyy').format(_selectedDate)}',
+          style: TextStyle(fontSize: 18),
         ),
         ElevatedButton(
-          onPressed: () {
-            setState(() {
-              _partyType = 'নতুন পার্টি';
-            });
+          onPressed: () async {
+            final pickedDate = await showDatePicker(
+              context: context,
+              initialDate: _selectedDate,
+              firstDate: DateTime(2000),
+              lastDate: DateTime(2101),
+            );
+            if (pickedDate != null) {
+              setState(() {
+                _selectedDate = pickedDate;
+              });
+            }
           },
-          style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-            backgroundColor: _partyType == 'নতুন পার্টি' ? Colors.green : Colors.grey,
-          ),
-          child: Text(
-            'নতুন পার্টি',
-            style: TextStyle(fontSize: 18, color: Colors.white),
-          ),
+          child: Text('তারিখ নির্বাচন করুন'),
         ),
       ],
     );
@@ -347,22 +315,67 @@ class _AddPurchasePageState extends State<AddPurchasePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ক্রয়', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.green,
+        title: Text('ক্রয় যুক্ত করুন'),
       ),
-      body: Container(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildPartyTypeSelection(), // Replacing dropdown with buttons
-                SizedBox(height: 20),
-                _partyType == 'নতুন পার্টি' ? _buildNewPartySection() : _buildOldPartySection(),
-              ],
-            ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _partyType = 'পুরাতন পার্টি';
+                        });
+                      },
+                      child: Text(
+                        'পুরাতন পার্টি',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _partyType = 'নতুন পার্টি';
+                        });
+                      },
+                      child: Text(
+                        'নতুন পার্টি',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              if (_partyType == 'পুরাতন পার্টি') _buildOldPartySection(),
+              if (_partyType == 'নতুন পার্টি') _buildNewPartySection(),
+              SizedBox(height: 20),
+              if (_partyType == 'পুরাতন পার্টি')
+                ElevatedButton(
+                  onPressed: _saveAdditionalAmount,
+                  child: Text('অতিরিক্ত পরিমাণ যুক্ত করুন'),
+                ),
+              if (_partyType == 'নতুন পার্টি')
+                ElevatedButton(
+                  onPressed: _saveNewSupplier,
+                  child: Text('সাপ্লায়ার সংরক্ষণ করুন'),
+                ),
+            ],
           ),
         ),
       ),
