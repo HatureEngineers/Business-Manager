@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../sales_management/due/due_collection.dart';
+import '../sales_management/customer/due/due_collection.dart';
 
 class SummaryCardSection extends StatelessWidget {
   final double screenWidth;

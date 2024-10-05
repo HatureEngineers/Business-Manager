@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'product_page.dart'; // Import your ProductPage
+import '../product_page.dart'; // Import your ProductPage
 
 class Product {
   final String name;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../sales_management/due/customer_due_list.dart'; //due page
-import '../sales_management/due/supplier_payment.dart';
-import '../personal_expense.dart';
-import '../sales_management/due/supplier_payment_list.dart';
-import '../stock_management_page.dart';
+import '../purchase_managenent/supplier/payment/supplier_payment.dart';
+import '../purchase_managenent/supplier/payment/supplier_payment_list.dart';
+import '../sales_management/customer/due/customer_due_list.dart';
+import '../expense/personal_expense.dart';
+import '../product_management/stock/stock_management_page.dart';
 
 class ActionGrid extends StatelessWidget {
   final BuildContext context;
